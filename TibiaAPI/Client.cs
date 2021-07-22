@@ -1,12 +1,15 @@
 ﻿using System;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Collections.Generic;
 
 namespace OXGaming.TibiaAPI
 {
     public class Client : IDisposable
     {
         private string _appearanceDatFile;
+
+        public HashSet<Constants.ServerPacketType> serverMessageParseFilter { get; } = new HashSet<Constants.ServerPacketType>();
 
         public Appearances.AppearanceStorage AppearanceStorage { get; } = new Appearances.AppearanceStorage();
 

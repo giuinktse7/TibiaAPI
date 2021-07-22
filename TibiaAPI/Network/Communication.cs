@@ -888,6 +888,14 @@ namespace OXGaming.TibiaAPI.Network
                     var opcode = inMessage.ReadByte();
                     currentPacket = (ServerPacketType)opcode;
 
+                    if (client.serverMessageParseFilter.Count > 0)
+                    {
+                        if (!client.serverMessageParseFilter.Contains(currentPacket))
+                        {
+                            return;
+                        }
+                    }
+
                     client.Logger.Debug($"[SERVER:{inMessage.SequenceNumber}] {opcode:X2} - {currentPacket}");
 
                     var packet = ServerPacket.CreateInstance(client, currentPacket);
