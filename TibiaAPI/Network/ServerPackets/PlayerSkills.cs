@@ -128,6 +128,7 @@ namespace OXGaming.TibiaAPI.Network.ServerPackets
             message.Write(ManaLeechAmount.Level);
             message.Write(ManaLeechAmount.Base);
 
+<<<<<<< HEAD
             message.Write(FatalAmount.Level);
             message.Write(FatalAmount.Base);
             
@@ -137,6 +138,8 @@ namespace OXGaming.TibiaAPI.Network.ServerPackets
             message.Write(MomentumAmount.Level);
             message.Write(MomentumAmount.Base);
 
+=======
+>>>>>>> 01d0182 ([Fork] - Initial commit)
             message.Write(MaxCapacity);
             message.Write(BonusCapacity);
         }

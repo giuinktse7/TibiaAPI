@@ -386,6 +386,9 @@ namespace OXGaming.TibiaAPI.Network
                 objectInstance.IsBrandNew = ReadByte();
             }
 
+            //if (objectType.FrameGroup[0].SpriteInfo.Animation != null)
+            //    objectInstance.Phase = ReadByte();
+
             return objectInstance;
         }
 

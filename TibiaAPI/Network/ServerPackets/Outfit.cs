@@ -83,7 +83,10 @@ namespace OXGaming.TibiaAPI.Network.ServerPackets
 			Type = message.ReadByte();
             if (Type == (byte)OutfitWindowType.SelectOutfit) {
                 IsMounted = message.ReadBool();
+<<<<<<< HEAD
 				isRandomMount = message.ReadBool();
+=======
+>>>>>>> 01d0182 ([Fork] - Initial commit)
             } else if (Type == (byte)OutfitWindowType.TryPodium) {
                 IsMounted = message.ReadBool();
 
@@ -140,7 +143,10 @@ namespace OXGaming.TibiaAPI.Network.ServerPackets
 			message.Write(Type);
 			if (Type == (byte)OutfitWindowType.SelectOutfit) {
 				message.Write(IsMounted);
+<<<<<<< HEAD
 				message.Write(isRandomMount);
+=======
+>>>>>>> 01d0182 ([Fork] - Initial commit)
 			} else if (Type == (byte)OutfitWindowType.TryPodium) {
 				message.Write(IsMounted);
 				

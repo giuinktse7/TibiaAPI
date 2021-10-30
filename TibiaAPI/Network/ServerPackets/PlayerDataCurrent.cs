@@ -26,6 +26,8 @@ namespace OXGaming.TibiaAPI.Network.ServerPackets
         public ushort Stamina { get; set; }
         public ushort StoreBoostAddend { get; set; }
         public ushort VoucherAddend { get; set; }
+        public ushort MagicShield { get; set; }
+        public ushort MaxMagicShield { get; set; }
 
         public byte LevelPercent { get; set; }
         public byte MagicLevel { get; set; }
