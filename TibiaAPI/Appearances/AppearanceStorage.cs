@@ -16,7 +16,8 @@ namespace OXGaming.TibiaAPI.Appearances
         {
             appearances = Utilities.Appearances.Parser.ParseFrom(datFileStream);
 
-            foreach (var appObj in appearances.Object) {
+            foreach (var appObj in appearances.Object)
+            {
                 if (appObj.Id > LastObjectId)
                     LastObjectId = appObj.Id;
             }
@@ -46,16 +47,7 @@ namespace OXGaming.TibiaAPI.Appearances
 
         public Utilities.Appearance GetObjectType(uint id)
         {
-<<<<<<< HEAD
             if (id > (uint)CreatureInstanceType.Creature && id <= LastObjectId)
-=======
-<<<<<<< HEAD
-            if (id > (uint)CreatureInstanceType.Creature && id <= lastObjectId)
-=======
-            if (id > (uint)CreatureInstanceType.Creature && id <= LastObjectId)
-            {
->>>>>>> 36e25f7 (Add GetItemNames project)
->>>>>>> a25a89d (Add GetItemNames project)
                 return appearances.Object.FirstOrDefault(o => o.Id == id);
 
             return null;
