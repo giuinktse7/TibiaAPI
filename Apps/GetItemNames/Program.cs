@@ -108,7 +108,7 @@ namespace DumpItems
             }
             return -1;
 
-            
+
         }
 
         static void Main(string[] args)
@@ -141,9 +141,11 @@ namespace DumpItems
                     }
                 }
                 */
-                
+
                 using (_client = new Client(_tibiaDirectory))
                 {
+                    _client.Connection.IsClientPacketParsingEnabled = true;
+                    _client.Connection.IsServerPacketParsingEnabled = true;
                     _client.Connection.IsServerPacketModificationEnabled = false;
                     _client.serverMessageParseFilter.Add(ServerPacketType.ObjectInfo);
                     _client.StartConnection();
