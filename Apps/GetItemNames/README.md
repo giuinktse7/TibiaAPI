@@ -3,7 +3,7 @@
 ## 1 Compilation
 
 1. Open `TibiaAPI.sln` in Visual Studio
-2. In `./Apps/GetItemNames/Program.cs:21`, update `_tibiaDirectory = "<path to your tibia installation>/packages/Tibia"` to match your tibia directory
+2. In `./Apps/GetItemNames/Program.cs:25`, update `_tibiaDirectory = "<path to your tibia installation>/packages/Tibia"` to match your tibia directory
 3. Build the solution (change to Release mode for faster runtime execution)
 
 ## 2 Modifying the client to connect to our proxy
