@@ -41,7 +41,6 @@ namespace DumpItems
             }
         }
 
-
         private static void SendItemNamesRequests()
         {
             StringBuilder sb = new StringBuilder();
@@ -103,12 +102,14 @@ namespace DumpItems
                 byte[] segment = new byte[pattern.Length];
                 Buffer.BlockCopy(buffer, i, segment, 0, pattern.Length);
                 if (segment.SequenceEqual<byte>(pattern))
+                {
                     return i;
+                }
+
                 i = Array.IndexOf<byte>(buffer, pattern[0], i + 1);
             }
+
             return -1;
-
-
         }
 
         static void CreateTibiaApiClient(byte[] originalClientData, string originalClientPath, string tibiaApiClientPath)
@@ -182,13 +183,12 @@ namespace DumpItems
 
                 var tibiaApiClientPath = _tibiaDirectory + "/bin/client_tibiaapi.exe";
 
-
-
                 using (_client = new Client(_tibiaDirectory))
                 {
                     _client.Connection.IsClientPacketParsingEnabled = true;
                     _client.Connection.IsServerPacketParsingEnabled = true;
                     _client.Connection.IsServerPacketModificationEnabled = false;
+
                     _client.serverMessageParseFilter.Add(ServerPacketType.ObjectInfo);
                     _client.StartConnection();
 
@@ -233,7 +233,6 @@ namespace DumpItems
             {
                 _client.StopConnection();
             }
-
         }
     }
 }
