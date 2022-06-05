@@ -111,36 +111,78 @@ namespace DumpItems
 
         }
 
+        static void CreateTibiaApiClient(byte[] originalClientData, string originalClientPath, string tibiaApiClientPath)
+        {
+            const string TIBIA_RSA = "BC27F992A96B8E2A43F4DFBE1CEF8FD51CF43D2803EE34FBBD8634D8B4FA32F7D9D9E159978DD29156D62F4153E9C5914263FC4986797E12245C1A6C4531EFE48A6F7C2EFFFFF18F2C9E1C504031F3E4A2C788EE96618FFFCEC2C3E5BFAFAF743B3FC7A872EE60A52C29AA688BDAF8692305312882F1F66EE9D8AEB7F84B1949";
+            const string OT_RSA = "9B646903B45B07AC956568D87353BD7165139DD7940703B03E6DD079399661B4A837AA60561D7CCB9452FA0080594909882AB5BCA58A1A1B35F8B1059B72B1212611C6152AD3DBB3CFBEE7ADC142A75D3D75971509C321C5C24A5BD51FD460F01B4E15BEB0DE1930528A5D3F15C1E3CBF5C401D6777E10ACAAB33DBE8D5B7FF5";
+
+            const string tibiaLoginService = "loginWebService=https://www.tibia.com/clientservices/loginservice.php";
+            const string tibiaAPILoginService = "loginWebService=http://127.0.0.1:7171/                               ";
+
+            var tibiaRsaIndex = IndexOfSequence(originalClientData, Encoding.ASCII.GetBytes(TIBIA_RSA), 0);
+
+            bool clientHasTibiaRsa = tibiaRsaIndex != -1;
+            if (!clientHasTibiaRsa)
+            {
+                Console.WriteLine($"The client at {originalClientPath} was already configured to use a different RSA than the Tibia RSA.");
+                return;
+            }
+
+            // TODO Can be made more efficient. Currently the whole client buffer is copied twice
+            var exeWithOtRsa = Util.ReplaceBytes(originalClientData, Encoding.ASCII.GetBytes(TIBIA_RSA), Encoding.ASCII.GetBytes(OT_RSA));
+            var exeWithLoginWebService = Util.ReplaceBytes(exeWithOtRsa, Encoding.ASCII.GetBytes(tibiaLoginService), Encoding.ASCII.GetBytes(tibiaAPILoginService));
+            File.WriteAllBytes(tibiaApiClientPath, exeWithLoginWebService);
+        }
+
+        // tibiaDirectory: "<Tibia Location>/packages/Tibia"
+        static void updateClient(string tibiaDirectory)
+        {
+            var originalClientPath = tibiaDirectory + "/bin/client.exe";
+            var tibiaApiClientPath = tibiaDirectory + "/bin/client_tibiaapi.exe";
+
+            var exe = File.ReadAllBytes(originalClientPath);
+            if (File.Exists(tibiaApiClientPath))
+            {
+                var tibiaApiExe = File.ReadAllBytes(tibiaApiClientPath);
+                bool updateTibiaApiClient = exe.Length != tibiaApiExe.Length;
+                if (updateTibiaApiClient)
+                {
+                    Console.WriteLine($"Your TibiaAPI client at {tibiaApiClientPath} seems to be outdated. Do you want to update it? (The original Tibia client will be preserved as {originalClientPath})? y/N");
+                    var response = Console.ReadLine();
+                    if (response.ToLower() == "y" || response.ToLower() == "yes")
+                    {
+                        CreateTibiaApiClient(exe, originalClientPath, tibiaApiClientPath);
+                        Console.WriteLine($"The client at {tibiaApiClientPath} has been updated to work with TibiaAPI.");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine($"Found valid TibiaAPI client at \"{tibiaApiClientPath}\".");
+                }
+            }
+            else
+            {
+                Console.WriteLine($"Do you want to create a client configured for TibiaAPI at {tibiaApiClientPath}? (The original client will be preserved as {originalClientPath})? y/N");
+                var response = Console.ReadLine();
+                if (response.ToLower() == "y" || response.ToLower() == "yes")
+                {
+                    CreateTibiaApiClient(exe, originalClientPath, tibiaApiClientPath);
+                    Console.WriteLine($"Created valid TibiaAPI client at {tibiaApiClientPath}");
+                }
+
+            }
+        }
+
+
         static void Main(string[] args)
         {
             try
             {
-                /*
-                 * TODO Simplify the process of changing the .exe using below code:
-                var exeDirectory = _tibiaDirectory + "/bin/client.exe";
-                var exe = File.ReadAllBytes(exeDirectory);
-                string TIBIA_RSA = "BC27F992A96B8E2A43F4DFBE1CEF8FD51CF43D2803EE34FBBD8634D8B4FA32F7D9D9E159978DD29156D62F4153E9C5914263FC4986797E12245C1A6C4531EFE48A6F7C2EFFFFF18F2C9E1C504031F3E4A2C788EE96618FFFCEC2C3E5BFAFAF743B3FC7A872EE60A52C29AA688BDAF8692305312882F1F66EE9D8AEB7F84B1949";
-                string OT_RSA = "9B646903B45B07AC956568D87353BD7165139DD7940703B03E6DD079399661B4A837AA60561D7CCB9452FA0080594909882AB5BCA58A1A1B35F8B1059B72B1212611C6152AD3DBB3CFBEE7ADC142A75D3D75971509C321C5C24A5BD51FD460F01B4E15BEB0DE1930528A5D3F15C1E3CBF5C401D6777E10ACAAB33DBE8D5B7FF5";
-                var tibiaRsaIndex = IndexOfSequence(exe, Encoding.ASCII.GetBytes(TIBIA_RSA), 0);
+                updateClient(_tibiaDirectory);
 
-                if (tibiaRsaIndex != -1)
-                {
-                    var originalExe = _tibiaDirectory + "/bin/client_original.exe";
-                    Console.WriteLine($"The tibia client at {exeDirectory} is not configured for proxy through GetItemNames. Configure it (The original client will be preserved as {originalExe})? y/N");
-                    var response = Console.ReadLine();
-                    if (response.ToLower() == "y" || response.ToLower() == "yes")
-                    {
-                        File.Copy(exeDirectory, originalExe);
+                var tibiaApiClientPath = _tibiaDirectory + "/bin/client_tibiaapi.exe";
 
-                        var otRsaBytes = Encoding.ASCII.GetBytes(OT_RSA);
-                        GCHandle pinnedArray = GCHandle.Alloc(otRsaBytes, GCHandleType.Pinned);
-                        void* otPtr = pinnedArray.AddrOfPinnedObject();
-                        Buffer.MemoryCopy(&otRsaBytes, exe, otRsaBytes.Length, otRsaBytes.Length);
 
-                        pinnedArray.Free();
-                    }
-                }
-                */
 
                 using (_client = new Client(_tibiaDirectory))
                 {
@@ -150,9 +192,9 @@ namespace DumpItems
                     _client.serverMessageParseFilter.Add(ServerPacketType.ObjectInfo);
                     _client.StartConnection();
 
-                    Console.WriteLine(@"Usage:
+                    Console.WriteLine($@"Usage:
     1. Start this program (already done).
-    2. Login to a Tibia server that is not protected by Battleye (Zuna/Zunera)
+    2. Login to a Tibia server that is not protected by Battleye (Zuna/Zunera) using the client at ""{tibiaApiClientPath}"".
     3. Write 'send' in this terminal once your character is online.
                     ");
 
