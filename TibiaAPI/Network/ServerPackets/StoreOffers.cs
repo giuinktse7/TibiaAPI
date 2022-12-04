@@ -68,15 +68,8 @@ namespace OXGaming.TibiaAPI.Network.ServerPackets
                     details.IsDisabled = message.ReadBool();
                     if (details.IsDisabled) {
                         details.DisabledReasons.Capacity = message.ReadByte();
-<<<<<<< HEAD
                         for (var x = 0; x < details.DisabledReasons.Capacity; ++x)
                             details.DisabledReasons.Add(message.ReadUInt16());
-=======
-                        for (var x = 0; x < details.DisabledReasons.Capacity; ++x) {
-                            var disabledReason = message.ReadString();
-                            details.DisabledReasons.Add(disabledReason);
-                        }
->>>>>>> 01d0182 ([Fork] - Initial commit)
                     }
 
                     details.HighlightState = message.ReadByte();
@@ -196,13 +189,10 @@ namespace OXGaming.TibiaAPI.Network.ServerPackets
                 message.Write(Collections[i]);
 
             message.Write(DisplaySubCategory);
-<<<<<<< HEAD
 
             count = Math.Min(DisableReasons.Count, ushort.MaxValue);
             for (var i = 0; i < count; ++i)
                 message.Write(DisableReasons[i]);
-=======
->>>>>>> 01d0182 ([Fork] - Initial commit)
 
             count = Math.Min(Offers.Count, ushort.MaxValue);
             message.Write((ushort)count);
