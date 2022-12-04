@@ -410,6 +410,7 @@
         PartyHuntAnalyser = 0x2B,
         TeamFinderAssembleTeam = 0x2C,
         TeamFinderJoinTeam = 0x2D,
+        UnknownFlag1_13_10_12872 = 0x60,
         ClientCheck = 0x63,
         GoPath = 0x64,
         GoNorth = 0x65,
@@ -542,7 +543,7 @@
         RequestShopOffers = 0xFB,
         BuyIngameShopOffer = 0xFC,
         OpenTransactionHistory = 0xFD,
-        GetTransactionHistory = 0xFE
+        GetTransactionHistory = 0xFE,
     }
 
     public enum ServerPacketType

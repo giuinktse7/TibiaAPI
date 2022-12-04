@@ -308,6 +308,8 @@ namespace OXGaming.TibiaAPI.Network
                     return new ClientPackets.CyclopediaBossSlots(client);
                 case ClientPacketType.CyclopediaBosstiary:
                     return new ClientPackets.CyclopediaBosstiary(client);
+                case ClientPacketType.UnknownFlag1_13_10_12872:
+                    return new ClientPacket();
                 default:
                     throw new Exception($"[ClientPacket.Create] Invalid packet type: {type}");
             }
