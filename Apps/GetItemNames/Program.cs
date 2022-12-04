@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using OXGaming.TibiaAPI;
 using OXGaming.TibiaAPI.Constants;
 using OXGaming.TibiaAPI.Network.ClientPackets;
@@ -22,7 +23,7 @@ namespace DumpItems
     {
         static Client _client;
 
-        static string _tibiaDirectory = "D:/Programs/TibiaLatest/packages/Tibia";
+        static string _tibiaDirectory = "C:/Users/giuin/AppData/Local/Tibia/packages/Tibia";
 
         public class GetObjectIdAndName : GetObjectInfo
         {
@@ -41,10 +42,16 @@ namespace DumpItems
 
         private static void SendItemNamesRequests()
         {
-            StringBuilder sb = new StringBuilder();
 
             const ushort MaxObjectsPerPacket = 255;
 
+            /* Starts:
+             * 100
+             * 14670
+             * 26947
+             * 29942
+             * 42049
+             */
             ushort start = 100;
             ushort end = Convert.ToUInt16(_client.AppearanceStorage.LastObjectId + 1);
 
@@ -52,9 +59,16 @@ namespace DumpItems
             ushort to = Convert.ToUInt16(Math.Min(from + MaxObjectsPerPacket, end));
 
             Console.WriteLine("Last object ID: " + (end - 1));
+            if (!File.Exists(@"./item_names.txt"))
+            {
+                File.WriteAllText(@"./item_names.txt", "");
+            }
+
 
             _client.Connection.OnReceivedServerObjectInfoPacket += (packet) =>
             {
+                StringBuilder sb = new StringBuilder();
+
                 var objectInfoPacket = (ObjectInfo)packet;
 
                 Console.WriteLine($"Received ids {from}-{to}");
@@ -71,18 +85,16 @@ namespace DumpItems
                     }
                 }
 
+                System.IO.File.AppendAllText(@"./item_names.txt", sb.ToString());
+
                 if (to != end)
                 {
                     from = to;
                     to = Convert.ToUInt16(Math.Min(from + MaxObjectsPerPacket, end));
 
+                    Console.WriteLine($"Sending request for {from}-{to}");
                     var nextPacket = new GetObjectIdAndName(_client, from, to);
                     _client.Connection.SendToServer(nextPacket);
-                }
-                else
-                {
-                    System.IO.File.WriteAllText(@"./item_names.txt", sb.ToString());
-                    Console.WriteLine("Done. Item names have been written to ./item_names.txt.");
                 }
 
                 return true;
