@@ -23,7 +23,7 @@ namespace DumpItems
     {
         static Client _client;
 
-        static string _tibiaDirectory = "C:/Users/giuin/AppData/Local/Tibia/packages/Tibia";
+        static string _tibiaDirectory = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "/Tibia/packages/Tibia";
 
         public class GetObjectIdAndName : GetObjectInfo
         {
