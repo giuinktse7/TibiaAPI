@@ -104,6 +104,63 @@ namespace DumpItems
             _client.Connection.SendToServer(firstPacket);
         }
 
+
+        public class GetCreatureIdAndName : LookAtCreature
+        {
+            public GetCreatureIdAndName(Client client, uint id) : base(client)
+            {
+                Client = client;
+                PacketType = ClientPacketType.LookAtCreature;
+                CreatureId = id;
+
+            }
+        }
+
+
+        private static void SendCreatureLookRequests()
+        {
+            StringBuilder sb = new StringBuilder();
+
+            ushort from = 0;
+            ushort to = 1000;
+
+
+            _client.Connection.OnReceivedServerMessagePacket += (packet) =>
+            {
+                var creatureLookPacket = (OXGaming.TibiaAPI.Network.ServerPackets.Message)packet;
+
+                if (creatureLookPacket.MessageMode == MessageModeType.Look)
+                {
+                    Console.WriteLine($"Received message: {creatureLookPacket.Text}");
+                }
+
+                if (!string.IsNullOrEmpty(creatureLookPacket.Text))
+                {
+                    sb.AppendLine($"[{to}] {creatureLookPacket.Text}");
+                }
+
+                if (to != 1000)
+                {
+                    from = to;
+                    to += 1;
+
+                    var nextPacket = new GetCreatureIdAndName(_client, to);
+                    _client.Connection.SendToServer(nextPacket);
+                }
+                else
+                {
+                    System.IO.File.WriteAllText(@"./creature_names.txt", sb.ToString());
+                    Console.WriteLine("Done. Creature names have been written to ./creature_names.txt.");
+                }
+
+                return true;
+            };
+
+
+            var firstPacket = new GetCreatureIdAndName(_client, to);
+            _client.Connection.SendToServer(firstPacket);
+        }
+
         public static int IndexOfSequence(byte[] buffer, byte[] pattern, int startIndex)
         {
             int i = Array.IndexOf<byte>(buffer, pattern[0], startIndex);
