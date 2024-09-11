@@ -262,7 +262,7 @@ namespace DumpItems
                     Console.WriteLine($@"Usage:
     1. Start this program (already done).
     2. Login to a Tibia server that is not protected by Battleye (Zuna/Zunera) using the client at ""{tibiaApiClientPath}"".
-    3. Write 'send' in this terminal once your character is online.
+    3. Write 'send' or 'mon' in this terminal once your character is online.
                     ");
 
                     bool exit = false;
@@ -274,6 +274,8 @@ namespace DumpItems
                             case "send":
                                 SendItemNamesRequests();
                                 break;
+                            case "mon":
+                                SendCreatureLookRequests();
                             case "quit":
                                 exit = true;
                                 break;
