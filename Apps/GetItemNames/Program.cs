@@ -104,6 +104,63 @@ namespace DumpItems
             _client.Connection.SendToServer(firstPacket);
         }
 
+
+        public class GetCreatureIdAndName : LookAtCreature
+        {
+            public GetCreatureIdAndName(Client client, uint id) : base(client)
+            {
+                Client = client;
+                PacketType = ClientPacketType.LookAtCreature;
+                CreatureId = id;
+
+            }
+        }
+
+
+        private static void SendCreatureLookRequests()
+        {
+            StringBuilder sb = new StringBuilder();
+
+            ushort from = 0;
+            ushort to = 1000;
+
+
+            _client.Connection.OnReceivedServerMessagePacket += (packet) =>
+            {
+                var creatureLookPacket = (OXGaming.TibiaAPI.Network.ServerPackets.Message)packet;
+
+                if (creatureLookPacket.MessageMode == MessageModeType.Look)
+                {
+                    Console.WriteLine($"Received message: {creatureLookPacket.Text}");
+                }
+
+                if (!string.IsNullOrEmpty(creatureLookPacket.Text))
+                {
+                    sb.AppendLine($"[{to}] {creatureLookPacket.Text}");
+                }
+
+                if (to != 1000)
+                {
+                    from = to;
+                    to += 1;
+
+                    var nextPacket = new GetCreatureIdAndName(_client, to);
+                    _client.Connection.SendToServer(nextPacket);
+                }
+                else
+                {
+                    System.IO.File.WriteAllText(@"./creature_names.txt", sb.ToString());
+                    Console.WriteLine("Done. Creature names have been written to ./creature_names.txt.");
+                }
+
+                return true;
+            };
+
+
+            var firstPacket = new GetCreatureIdAndName(_client, to);
+            _client.Connection.SendToServer(firstPacket);
+        }
+
         public static int IndexOfSequence(byte[] buffer, byte[] pattern, int startIndex)
         {
             int i = Array.IndexOf<byte>(buffer, pattern[0], startIndex);
@@ -205,7 +262,7 @@ namespace DumpItems
                     Console.WriteLine($@"Usage:
     1. Start this program (already done).
     2. Login to a Tibia server that is not protected by Battleye (Zuna/Zunera) using the client at ""{tibiaApiClientPath}"".
-    3. Write 'send' in this terminal once your character is online.
+    3. Write 'send' or 'mon' in this terminal once your character is online.
                     ");
 
                     bool exit = false;
@@ -216,6 +273,9 @@ namespace DumpItems
                         {
                             case "send":
                                 SendItemNamesRequests();
+                                break;
+                            case "mon":
+                                SendCreatureLookRequests();
                                 break;
                             case "quit":
                                 exit = true;
