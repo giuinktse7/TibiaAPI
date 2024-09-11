@@ -276,6 +276,7 @@ namespace DumpItems
                                 break;
                             case "mon":
                                 SendCreatureLookRequests();
+                                break;
                             case "quit":
                                 exit = true;
                                 break;
